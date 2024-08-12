@@ -1,6 +1,7 @@
 import express  from 'express';
 import {config} from "dotenv";
 import { DB } from './config/db/db';
+import { errorHandler } from './middlewares/errors-handlers';
 config()
 
 // Create an Express application
@@ -15,6 +16,10 @@ const port: (number | string ) =  process.env.PORT || 3000;
 
 // database connecting
 DB()
+
+// error handler 
+app.use(errorHandler);
+
 
 // Start the server and listen on the specified port
 app.listen(port, () => {
