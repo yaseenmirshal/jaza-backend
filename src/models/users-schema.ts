@@ -46,6 +46,10 @@ const usersSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    isPermission : {
+        type : Boolean,
+        default : false
+    } ,
     isDelete: {
         type: Boolean,
         default: false
@@ -57,9 +61,9 @@ const usersSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Wishlist",
     }]
-});
+},{timestamps : true});
 
 // Create the User Model
-const User = mongoose.model("User", usersSchema);
+const Users = mongoose.model("User", usersSchema);
 
-export default User;
+export default Users;
