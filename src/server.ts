@@ -1,8 +1,10 @@
 import express  from 'express';
 import {config} from "dotenv";
 import { DB } from './config/db/db';
-import { errorHandler } from './middlewares/errors-handlers';
+import  errorHandler  from './middlewares/errors-handlers';
 import user_router from "./routers/users-route"
+import staff_router from './routers/staff-route';
+
 config()
 
 
@@ -13,18 +15,19 @@ const app = express();
 app.use(express.json())
 
 
-// Specify the port number for the server
-const port: (number | string ) =  process.env.PORT || 3000;
-
 // End points
 
 app.use("/api/users", user_router);
+app.use("/api/staff", staff_router);
+
+// error handler 
+app.use(errorHandler);
 
 // database connecting
 DB()
 
-// error handler 
-app.use(errorHandler);
+// Specify the port number for the server
+const port: (number | string ) =  process.env.PORT || 3000;
 
 
 // Start the server and listen on the specified port
