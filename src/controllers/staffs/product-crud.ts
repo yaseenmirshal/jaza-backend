@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { v2 as cloudinary } from 'cloudinary'; 
 import Products from "../../models/products-schema";
 import createError from "http-errors";
-import { productCreateJ, productUpdateJ } from "../../utils/validation/products";
+import { productCreateJ, productUpdateJ } from "../../utils/joi/product/products";
 import { ValidationError } from "joi";
 
 
