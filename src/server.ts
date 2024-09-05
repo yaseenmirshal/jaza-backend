@@ -4,6 +4,7 @@ import { DB } from './config/db/db';
 import  errorHandler  from './middlewares/errors-handlers';
 import user_router from "./routers/users-route"
 import staff_router from './routers/staff-route';
+import { limiter } from './middlewares/rate-limi';
 
 config()
 
@@ -17,8 +18,8 @@ app.use(express.json())
 
 // End points
 
-app.use("/api/users", user_router);
-app.use("/api/staff", staff_router);
+app.use("/api/users", limiter, user_router);
+app.use("/api/staff",  staff_router);
 
 // error handler 
 app.use(errorHandler);
