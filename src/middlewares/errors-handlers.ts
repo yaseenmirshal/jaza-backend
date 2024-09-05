@@ -1,3 +1,5 @@
+// error handler
+
 import { Request, Response, NextFunction } from 'express';
 
 interface CustomError extends Error {
@@ -7,9 +9,8 @@ interface CustomError extends Error {
     name: string;
   }
   
-// error handler
 
-export const errorHandler = (error: CustomError, req: Request, res: Response, next: NextFunction) => {
+ const errorHandler = (error: CustomError, req: Request, res: Response, next: NextFunction) => {
     if (error.statusCode) {
         return res.status(error.statusCode).json({ message: error.message });
     };
@@ -26,7 +27,9 @@ export const errorHandler = (error: CustomError, req: Request, res: Response, ne
     }
     if (error.code === 11000) {
         const keyName = Object.keys(error.keyValue ?? {})[0];
-        return res.json({ message: `Given ${keyName} is already exist` })
+        return res.status(409).json({ message: `Given ${keyName} is already exist` })
     }
     return res.status(500).json({ message: error });
 }
+
+export default errorHandler
