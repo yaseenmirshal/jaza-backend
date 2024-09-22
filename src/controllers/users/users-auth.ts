@@ -1,39 +1,44 @@
 import {Request , Response} from "express"
-import usersJoi from "../../utils/joi/users/usersjoi"
+import { usersCreateJ } from "../../utils/joi/users/usersjoi"
 import Users from "../../models/users-schema"
 import bcrypt from "bcrypt"
 import jwt from 'jsonwebtoken'
+import createError from "http-errors";
+import { ValidationError } from "joi"
+
+interface UserData {
+   name: string,
+   email: string,
+   password: string,
+   phone: string
+}
 
 
 
 export const users_registers = async (req :Request , res : Response):Promise<Response> =>{
     // validate user data
-    const {error , value} = usersJoi.validate(req.body)
-    // if error throw the error
+
+    const { error, value: userData } = usersCreateJ.validate(req.body) as { value: UserData ; error: ValidationError };
+
     if (error) {
-        throw new Error (error.details[0].message)
-      }
-   // find user already register user
-   const user = await Users.findOne({email : value.email})
-   //if the already registerd
-   if(user) {
-    return res.status(400).json({message : "Email Already Registerd"})
-   }
+        throw new createError[400](error.details[0].message);
+    }
+
    // if not registerd hash password using bcrypt
-   const hash_password = bcrypt.hashSync(value.password,10)
+   const hash_password = bcrypt.hashSync(userData.password,10)
    // creating new user
    const create_user = new Users({
-    name : value.name,
-    email:value.email,
+    name : userData.name,
+    email: userData.email,
     password:hash_password,
-    phone:value.phone
+    phone: userData.phone
    })
    await create_user.save()
 
    const accesstoken = jwt.sign({id:create_user._id,name : create_user.name ,email: create_user.email},process.env.ACCESS_TOKEN_KEY as string, {expiresIn: "1h"})
 
    const refresh_token = jwt.sign({id:create_user._id,name : create_user.name ,email: create_user.email},process.env.REFRESH_TOKEN_KEY as string , {expiresIn : "30d"})
-    return res.status(201).json({message : "Register Successfully", accesstoken, refresh_token})
+    return res.status(201).json({status: "Ok", message : "Register Successfully", accesstoken, refresh_token})
 }
 
 
@@ -41,7 +46,7 @@ export const users_registers = async (req :Request , res : Response):Promise<Res
 
 export const users_logins = async (req : Request , res : Response): Promise<Response>=>{
     // get data from req body
-    const {email , password} = req.body
+    const {email , password} = req.body as {email: string, password:  string};
     // find user from database using email
     const user = await Users.findOne({email})
     // if not found user 
@@ -63,5 +68,5 @@ export const users_logins = async (req : Request , res : Response): Promise<Resp
     // create refresh token
    const refresh_token = jwt.sign({id:user._id,name : user.name ,email: user.email},process.env.REFRESH_TOKEN_KEY as string , {expiresIn : "30d"})
    // passing response user
-    return res.status(201).json({message : "Login Successfully", accesstoken, refresh_token})
+    return res.status(201).json({status: "Ok", message : "Login Successfully", accesstoken, refresh_token})
 }

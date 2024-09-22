@@ -1,8 +1,13 @@
 import express  from 'express';
 import {config} from "dotenv";
 import { DB } from './config/db/db';
-import { errorHandler } from './middlewares/errors-handlers';
+import  errorHandler  from './middlewares/errors-handlers';
 import user_router from "./routers/users-route"
+import staff_router from './routers/staff-route';
+import { limiter } from './middlewares/rate-limi';
+import admin_router from './routers/admin-route';
+import logger from './utils/logger/logger';
+
 config()
 
 
@@ -13,21 +18,24 @@ const app = express();
 app.use(express.json())
 
 
-// Specify the port number for the server
-const port: (number | string ) =  process.env.PORT || 3000;
-
 // End points
 
-app.use("/api/users", user_router);
+app.use("/api/users", limiter, user_router);
+app.use("/api/staff",  staff_router);
+app.use("/api/admin",  admin_router);
 
-// database connecting
-DB()
 
 // error handler 
 app.use(errorHandler);
 
+// database connecting
+DB()
+
+// Specify the port number for the server
+const port: (number | string ) =  process.env.PORT || 3000;
+
 
 // Start the server and listen on the specified port
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  logger.info(`Server is running on http://localhost:${port}`);
 });
