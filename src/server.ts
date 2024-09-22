@@ -5,6 +5,8 @@ import  errorHandler  from './middlewares/errors-handlers';
 import user_router from "./routers/users-route"
 import staff_router from './routers/staff-route';
 import { limiter } from './middlewares/rate-limi';
+import admin_router from './routers/admin-route';
+import logger from './utils/logger/logger';
 
 config()
 
@@ -20,6 +22,8 @@ app.use(express.json())
 
 app.use("/api/users", limiter, user_router);
 app.use("/api/staff",  staff_router);
+app.use("/api/admin",  admin_router);
+
 
 // error handler 
 app.use(errorHandler);
@@ -33,5 +37,5 @@ const port: (number | string ) =  process.env.PORT || 3000;
 
 // Start the server and listen on the specified port
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  logger.info(`Server is running on http://localhost:${port}`);
 });
